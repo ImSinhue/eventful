@@ -1,0 +1,103 @@
+<style>
+  /* Estilos personalizados para un toque moderno */
+
+  /* Degradado en el header */
+  .bg-gradient-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+  }
+
+  /* Efecto hover en las cards */
+  .hover-scale {
+    transition: transform 0.3s;
+  }
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  /* Ajustes en el select para hacerlo más atractivo */
+  .form-select {
+    border-radius: 0.375rem;
+  }
+
+  /* Ajustes generales en las cards */
+  .card {
+    border-radius: 0.75rem;
+  }
+
+  /* Fuerza la altura de las imágenes a 400px y ajusta el recorte */
+  .card-img-top {
+    height: 200px;
+    
+    object-fit: cover;
+  }
+</style>
+
+<div class="card shadow-sm my-4">
+  <div class="card-header bg-gradient-primary text-white py-3">
+    <h4 class="mb-0">Lista de Eventos</h4>
+  </div>
+  <div class="card-body">
+    <form class="p-3 mb-4 border-bottom">
+      <div class="row align-items-center">
+        <div class="col-md-3 mb-2">
+          <label for="filterName" class="form-label fw-bold">Buscar por nombre:</label>
+          <input type="text" [(ngModel)]="filterSearch" name="filterName" id="filterName"
+            class="form-control" placeholder="Ej: Tech Conference" />
+        </div>
+        <div class="col-md-3 mb-2">
+          <label for="filterCategory" class="form-label fw-bold">Categoría:</label>
+          <select class="form-select" [(ngModel)]="categorySearch" id="filterCategory" name="filterCategory">
+            <option value="">Selecciona una categoría</option>
+            <option value="Technology">Technology</option>
+            <option value="Art">Art</option>
+            <option value="Music">Music</option>
+            <option value="Monologues">Monologues</option>
+            <option value="Cinema">Cinema</option>
+            <option value="Circus">Circus</option>
+            <option value="Conferences">Conferences</option>
+            <option value="Sports">Sports</option>
+            <option value="Museums and Exhibitions">Museums and Exhibitions</option>
+            <option value="Musicals">Musicals</option>
+            <option value="Theme Parks">Theme Parks</option>
+            <option value="Theater and Dance">Theater and Dance</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-2 d-flex align-items-end">
+          <button type="button" class="btn btn-primary w-100" (click)="applyFilter()">
+            <i class="bi bi-funnel-fill me-2"></i>Aplicar Filtro
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Lista de eventos -->
+    <div *ngIf="filteredEvents && filteredEvents.length > 0" class="container">
+      <div class="row g-4">
+        <div *ngFor="let event of filteredEvents" class="col-md-6 col-lg-4">
+          <div class="card h-100 border-0 shadow-sm hover-scale">
+            <img [src]="'assets/' + event.picture" class="card-img-top" alt="{{ event.name }}">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title text-primary">{{ event.name | titlecase }}</h5>
+              <p class="card-text flex-grow-1">{{ event.description }}</p>
+              <ul class="list-group list-group-flush mb-3">
+                <li class="list-group-item"><strong>Idioma:</strong> {{ event.language }}</li>
+                <li class="list-group-item"><strong>Categoría:</strong> {{ event.category }}</li>
+                <li class="list-group-item"><strong>Audiencia objetivo:</strong> {{ event.targetAudience }}</li>
+              </ul>
+              <div class="mt-auto">
+                <button *ngIf="event.id" [routerLink]="['/details', event.id]" class="btn btn-outline-primary w-100">
+                  Ver Detalles
+                </button>
+                              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensaje cuando no se encuentran eventos -->
+    <div *ngIf="filteredEvents && filteredEvents.length === 0" class="alert alert-info mt-4">
+      No se encontraron eventos con los criterios seleccionados.
+    </div>
+  </div>
+</div>

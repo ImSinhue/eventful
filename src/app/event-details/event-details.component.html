@@ -1,0 +1,154 @@
+<div class="container mt-4 d-flex justify-content-center align-items-center">
+  <div class="card p-4 shadow-sm text-center">
+    <!-- Event Details -->
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <h1 class="text-primary">{{ event?.name }}</h1>
+        <p class="lead">{{ event?.description }}</p>
+      </div>
+      <div class="col-md-4 text-center">
+        <img
+          [src]="event?.picture ? 'assets/' + event?.picture : 'assets/default.png'"
+          class="img-fluid event-img"
+          alt="{{ event?.name }}"
+        />
+      </div>
+    </div>
+
+    <!-- Additional Details -->
+    <div class="row mt-4 text-center">
+      <div class="col-md-4"><strong>Categoría:</strong> {{ event?.category }}</div>
+      <div class="col-md-4"><strong>Idioma:</strong> {{ event?.language }}</div>
+      <div class="col-md-4"><strong>Público objetivo:</strong> {{ event?.targetAudience }}</div>
+    </div>
+
+    <!-- Room Selection -->
+    <div class="row mt-4 justify-content-center">
+      <div *ngFor="let roomDetail of rooms" class="col-md-4 d-flex justify-content-center">
+        <div
+          class="card mb-3"
+          (click)="selectRoom(roomDetail.room)"
+          [class.selected]="selectedRoom?.id === roomDetail.room.id"
+        >
+          <div class="card-body">
+            <h5 class="card-title">{{ roomDetail.room.name }}</h5>
+            <p class="card-text">Selecciona una sesión para ver los asientos disponibles.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session Selection -->
+    <div class="row mt-4 justify-content-center" *ngIf="selectedRoom">
+      <div class="col-md-8">
+        <h3>Sesiones Disponibles en {{ selectedRoom?.name }}</h3>
+        <ul class="list-group">
+          <li
+            *ngFor="let session of getSessionList(selectedRoom?.id)"
+            class="list-group-item text-center"
+            (click)="selectSession(session)"
+            [class.active]="session === selectedSession"
+          >
+            {{ session.date | date: 'fullDate' }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Seat Selection -->
+    <div class="row mt-4 justify-content-center" *ngIf="selectedSession">
+      <div class="col-md-12 text-center">
+        <h3>Selecciona tus Asientos</h3>
+        <div *ngFor="let row of seatsLayout" class="row justify-content-center">
+          <div
+            *ngFor="let seat of row"
+            class="seat"
+            [ngClass]="{
+              'unavailable': seat.ticket !== null,
+              'selected': isSeatSelected(seat),
+              'gold-seat': seat.price >= 30,
+              'green-seat': seat.price <= 30
+            }"
+            (click)="seat.ticket === null ? selectSeat(seat) : $event.stopPropagation()" 
+          >
+            {{ seat.seatNum }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Price and Purchase -->
+    <div class="row mt-4 justify-content-center" *ngIf="selectedSeats.length > 0">
+      <div class="col-md-6 text-center">
+        <h4>Total a pagar: <strong>{{ getTotalPrice() | currency }}</strong></h4>
+        <button class="btn btn-success btn-lg" 
+        [routerLink]="['/payment']" 
+        [queryParams]="{ seats: selectedSeats | json, total: getTotalPrice() }">
+  Comprar
+</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Inline Styles -->
+<style>
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .card {
+    width: 80%;
+    text-align: center;
+  }
+
+  .row {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .seat {
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+  }
+
+  .seat.green-seat {
+    background-color: #32cd32; /* Verde para precios menores a 30 */
+  }
+
+  .seat.gold-seat {
+    background-color: gold; /* Oro para precios de 30 o más */
+  }
+
+  .seat.selected {
+    border: 2px solid black; /* Borde negro al seleccionar */
+  }
+
+  .seat.unavailable {
+    background-color: #a9a9a9; /* Asiento no disponible */
+    cursor: not-allowed;
+    pointer-events: none; /* Bloquea la interacción */
+  }
+
+  .btn-success {
+    font-size: 1.5rem; /* Botón más grande */
+    padding: 12px 24px;
+  }
+
+  .selected {
+    background-color: #007bff;
+    color: white;
+  }
+</style>
